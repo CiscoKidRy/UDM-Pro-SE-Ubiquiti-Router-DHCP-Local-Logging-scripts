@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the UDM DHCP-logging watchdog every 15 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=15min
+Persistent=true
+Unit=udm-dhcp-logging-check.service
+
+[Install]
+WantedBy=timers.target

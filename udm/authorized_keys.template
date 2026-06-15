@@ -1,0 +1,21 @@
+# authorized_keys entry format for the Raspberry Pi watchdog's root access to the UDM.
+#
+# Generate the keypair ON THE PI (private key never leaves the Pi):
+#   ssh-keygen -t ed25519 -a 100 -f ~/.ssh/udm_restore_ed25519 -N "" -C "pi-udm-restore@<PI_HOSTNAME>"
+#
+# Then append the resulting PUBLIC key (~/.ssh/udm_restore_ed25519.pub), hardened
+# with the restrictions below, to BOTH of these files on the UDM:
+#   /data/on_boot.d/settings/ssh/authorized_keys   (authoritative, persistent)
+#   /root/.ssh/authorized_keys                      (live runtime copy)
+#
+# Hardened entry (replace <...> placeholders with the real values):
+#
+#   from="<PI_LAN_IP>",restrict,pty ssh-ed25519 <PI_PUBLIC_KEY> pi-udm-restore@<PI_HOSTNAME>
+#
+#   from="<PI_LAN_IP>"  - only accept this key from the Pi's reserved LAN IP
+#   restrict            - disable port/agent/X11 forwarding and tunneling
+#   pty                 - re-allow a pseudo-terminal (restore needs an interactive-ish shell)
+#
+# SECURITY NOTE: this key grants ROOT on the gateway. Keep the private key on the
+# Pi only (mode 600), never commit it, never copy it to Dropbox/Windows. Pair with
+# a DHCP reservation so the Pi keeps <PI_LAN_IP>.

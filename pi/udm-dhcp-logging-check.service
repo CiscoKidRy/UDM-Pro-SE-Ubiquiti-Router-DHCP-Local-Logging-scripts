@@ -1,0 +1,10 @@
+[Unit]
+Description=Off-box watchdog: verify + restore UDM DHCP logging
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# %h expands to the service user's home; the clone lives at ~/udm-dhcp-logging
+ExecStart=%h/udm-dhcp-logging/pi/udm-dhcp-logging-check.sh
+Nice=10

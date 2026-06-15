@@ -1,0 +1,8 @@
+# Force LF on everything that runs on Linux (UDM/Pi) so Windows CRLF never
+# corrupts the shell scripts / systemd units when cloned.
+* text=auto eol=lf
+*.sh text eol=lf
+*.service text eol=lf
+*.timer text eol=lf
+*.template text eol=lf
+*.md text eol=lf
