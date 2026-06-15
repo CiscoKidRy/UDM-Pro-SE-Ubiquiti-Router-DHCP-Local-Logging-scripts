@@ -33,11 +33,12 @@ chmod 600 "$KNOWN" 2>/dev/null || true
 # 3. Make scripts executable.
 chmod 0755 "$SCRIPT_DIR"/*.sh
 
-# 4. Install + enable the systemd timer (user-scoped paths via %h).
-sudo cp "$SCRIPT_DIR/udm-dhcp-logging-check.service" /etc/systemd/system/
-sudo cp "$SCRIPT_DIR/udm-dhcp-logging-check.timer"   /etc/systemd/system/
-# Run the oneshot as the invoking user so ~/.ssh and ~/udm-dhcp-logging resolve.
-sudo sed -i "s/^\[Service\]/[Service]\nUser=$USER/" /etc/systemd/system/udm-dhcp-logging-check.service 2>/dev/null || true
+# 4. Install + enable the systemd timer. Substitute absolute path + user into
+#    the service (systemd %h is unreliable in a system unit).
+CHECK="$SCRIPT_DIR/udm-dhcp-logging-check.sh"
+sudo cp "$SCRIPT_DIR/udm-dhcp-logging-check.timer" /etc/systemd/system/
+sed -e "s|__RUN_USER__|$USER|" -e "s|__CHECK_SCRIPT__|$CHECK|" \
+    "$SCRIPT_DIR/udm-dhcp-logging-check.service" | sudo tee /etc/systemd/system/udm-dhcp-logging-check.service >/dev/null
 sudo systemctl daemon-reload
 sudo systemctl enable --now udm-dhcp-logging-check.timer
 
