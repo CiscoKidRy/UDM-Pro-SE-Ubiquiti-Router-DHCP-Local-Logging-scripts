@@ -41,7 +41,11 @@ udm_ssh() { ssh "${SSH_OPTS[@]}" "$UDM_USER@$UDM_HOST" "$@"; }
 log() { logger -t udm-watchdog "$*"; echo "[$(date '+%F %T')] $*"; }
 
 notify() {  # notify <severity> <subject> <body>
-    [ -x "$NOTIFY" ] && "$NOTIFY" "$1" "$2" "$3" || log "notify skipped (no $NOTIFY): $2"
+    if [ -x "$NOTIFY" ]; then
+        "$NOTIFY" "$1" "$2" "$3" || log "notify command failed (check gmail.secret): $2"
+    else
+        log "notify skipped (not executable: $NOTIFY): $2"
+    fi
 }
 
 # --- single-instance lock ----------------------------------------------------
